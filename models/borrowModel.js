@@ -35,8 +35,32 @@ const borrowSchema = new mongoose.Schema({
     dueDate: {
         type: Date,
         required: [true, 'Tanggal pengembalian harus diisi'],
+        validate: {
+            validator: function(value) {
+                // Pastikan tanggal valid
+                if (!(value instanceof Date) || isNaN(value)) {
+                    return false;
+                }
+                // Pastikan tanggal pengembalian setelah tanggal peminjaman
+                return value > this.borrowDate;
+            },
+            message: props => {
+                if (!(props.value instanceof Date) || isNaN(props.value)) {
+                    return 'Format tanggal tidak valid. Gunakan format: YYYY-MM-DDTHH:mm:ss.sssZ';
+                }
+                return 'Tanggal pengembalian harus setelah tanggal peminjaman';
+            }
+        },
         set: function(val) {
-            return convertToWIB(val);
+            if (val instanceof Date) {
+                return convertToWIB(val);
+            }
+            // Coba parse jika string
+            const parsed = new Date(val);
+            if (!isNaN(parsed)) {
+                return convertToWIB(parsed);
+            }
+            return val; // Biarkan mongoose handle error
         }
     },
     returnDate: {

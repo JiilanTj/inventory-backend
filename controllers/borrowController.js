@@ -1,6 +1,7 @@
 const Borrow = require('../models/borrowModel');
 const Item = require('../models/itemModel');
 const { getCurrentWIB, convertToWIB, getStartOfDayWIB, getEndOfDayWIB } = require('../utils/timeHelper');
+const emailService = require('../utils/emailService');
 
 // Create borrow request
 exports.createBorrow = async (req, res) => {
@@ -13,11 +14,21 @@ exports.createBorrow = async (req, res) => {
             req.body.dueDate = convertToWIB(req.body.dueDate);
         }
         
-        // Validate items availability
+        // Validate items existence and availability
         const itemIds = req.body.items.map(item => item.item);
         const items = await Item.find({ _id: { $in: itemIds } });
+
+        // Check if all items exist
+        if (items.length !== itemIds.length) {
+            const foundIds = items.map(item => item._id.toString());
+            const notFoundIds = itemIds.filter(id => !foundIds.includes(id));
+            return res.status(400).json({
+                status: 'fail',
+                message: `Beberapa barang tidak ditemukan dengan ID: ${notFoundIds.join(', ')}`
+            });
+        }
         
-        // Check if all items exist and are available
+        // Check if all items are available
         const unavailableItems = items.filter(item => item.status !== 'Tersedia');
         if (unavailableItems.length > 0) {
             return res.status(400).json({
@@ -34,10 +45,22 @@ exports.createBorrow = async (req, res) => {
             { status: 'Dipinjam' }
         );
 
+        // Send email notification to admin
+        const populatedBorrow = await Borrow.findById(borrow._id)
+            .populate('user', 'name email class')
+            .populate('items.item', 'name code');
+        
+        await emailService.sendNewBorrowNotification(populatedBorrow);
+
+        // Return populated response
+        const fullBorrow = await Borrow.findById(borrow._id)
+            .populate('user', 'name email class')
+            .populate('items.item', 'name code category');
+
         res.status(201).json({
             status: 'success',
             data: {
-                borrow
+                borrow: fullBorrow
             }
         });
     } catch (err) {
@@ -154,6 +177,8 @@ exports.updateBorrowStatus = async (req, res) => {
             });
         }
 
+        const oldStatus = borrow.status;
+
         // Update borrow status
         borrow.status = status;
         borrow.approvedBy = req.user.id;
@@ -175,6 +200,13 @@ exports.updateBorrowStatus = async (req, res) => {
         }
 
         await borrow.save();
+
+        // Send email notification to user
+        const populatedBorrow = await Borrow.findById(borrow._id)
+            .populate('user', 'name email class')
+            .populate('items.item', 'name code');
+        
+        await emailService.sendStatusUpdateNotification(populatedBorrow, oldStatus);
 
         res.status(200).json({
             status: 'success',

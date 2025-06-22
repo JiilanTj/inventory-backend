@@ -1,6 +1,6 @@
 # Inventory Management System API Documentation
 
-Backend sistem manajemen inventaris untuk jurusan RPL dengan fitur autentikasi, manajemen barang, sistem peminjaman, dan export data.
+Backend sistem manajemen inventaris untuk jurusan RPL dengan fitur autentikasi, manajemen barang, sistem peminjaman, export data, dan notifikasi email.
 
 ## 🚀 Tech Stack
 - Node.js & Express
@@ -8,11 +8,13 @@ Backend sistem manajemen inventaris untuk jurusan RPL dengan fitur autentikasi, 
 - JWT Authentication
 - BCrypt Password Hashing
 - ExcelJS & PDFKit untuk export data
+- Nodemailer untuk notifikasi email
 
 ## 📋 Prerequisites
 - Node.js v14+
 - MongoDB
 - NPM/Yarn
+- Gmail account untuk notifikasi email
 
 ## 🛠 Installation & Setup
 
@@ -29,11 +31,27 @@ npm install
 
 3. Setup environment variables (.env)
 ```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/inventori
+# Database Configuration
+DATABASE_LOCAL=mongodb://localhost:27017/inventori
+
+# JWT Configuration
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=30d
+
+# Email Configuration
+EMAIL_USERNAME=your_gmail@gmail.com
+EMAIL_PASSWORD=your_app_specific_password
+ADMIN_EMAIL=admin@rpl.com
 ```
+
+Untuk konfigurasi email:
+1. Gunakan akun Gmail
+2. Aktifkan 2-Step Verification
+3. Generate App Password:
+   - Buka https://myaccount.google.com/security
+   - Di bagian "2-Step Verification", scroll ke "App passwords"
+   - Generate App Password baru
+   - Gunakan password tersebut sebagai EMAIL_PASSWORD
 
 4. Seed database dengan admin dan sample items
 ```bash
@@ -478,6 +496,30 @@ Menghasilkan file PDF dengan:
 - Total peminjaman di akhir laporan
 - Nama file: `Peminjaman_YYYY-MM-DD.pdf`
 
+## 📧 Email Notifications
+
+Sistem dilengkapi dengan notifikasi email otomatis untuk:
+
+### 1. Notifikasi Peminjaman Baru (ke Admin)
+- Dikirim saat user membuat permintaan peminjaman baru
+- Berisi detail peminjam, barang, dan tanggal
+- Format: HTML dengan styling
+
+### 2. Notifikasi Update Status (ke User)
+- Dikirim saat status peminjaman diubah (approved/rejected/returned)
+- Berisi status baru dan instruksi selanjutnya
+- Untuk status rejected, menyertakan alasan penolakan
+
+### 3. Due Date Reminder (ke User)
+- Dikirim H-1 sebelum tanggal pengembalian
+- Mengingatkan user untuk mengembalikan barang
+- Berisi detail barang yang dipinjam
+
+### 4. Notifikasi Keterlambatan (ke User)
+- Dikirim saat peminjaman melewati due date
+- Mengingatkan user untuk segera mengembalikan barang
+- Berisi detail barang dan tanggal seharusnya
+
 ## ✅ Fitur yang Sudah Diimplementasikan
 
 ### 1. Authentication System
@@ -518,7 +560,16 @@ Menghasilkan file PDF dengan:
 - [x] Auto-paging untuk PDF
 - [x] Styling untuk Excel
 
-### 5. Extra Features
+### 5. Email Notifications
+- [x] Setup Nodemailer dengan Gmail
+- [x] Template email HTML
+- [x] Notifikasi peminjaman baru ke admin
+- [x] Notifikasi update status ke user
+- [x] Due date reminder (H-1)
+- [x] Notifikasi keterlambatan
+- [x] Error handling untuk email
+
+### 6. Extra Features
 - [x] Timezone WIB untuk semua operasi
 - [x] Database seeder untuk testing
 - [x] Dokumentasi API lengkap
@@ -528,22 +579,14 @@ Menghasilkan file PDF dengan:
 
 ## ❌ Fitur yang Belum Diimplementasikan
 
-### 1. Email Notifications
-- [ ] Setup Nodemailer
-- [ ] Template email
-- [ ] Notifikasi peminjaman baru
-- [ ] Notifikasi status update
-- [ ] Due date reminder
-- [ ] Overdue notice
-
-### 2. Security & Performance
+### 1. Security & Performance
 - [ ] Rate limiting untuk API
 - [ ] API key untuk public access
 - [ ] Request validation
 - [ ] Response compression
 - [ ] Cache layer
 
-### 3. Testing & Monitoring
+### 2. Testing & Monitoring
 - [ ] Unit testing dengan Jest
 - [ ] Integration testing
 - [ ] API testing
@@ -551,7 +594,7 @@ Menghasilkan file PDF dengan:
 - [ ] Performance monitoring
 - [ ] Error tracking
 
-### 4. Backup & Recovery
+### 3. Backup & Recovery
 - [ ] Scheduled MongoDB backups
 - [ ] Cloud backup
 - [ ] Backup rotation

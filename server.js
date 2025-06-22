@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
+const { startSchedulers } = require('./utils/scheduler');
 
 const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
@@ -22,7 +23,12 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('✅ MongoDB connected'))
+.then(() => {
+    console.log('✅ Connected to MongoDB');
+    // Start email schedulers after DB connection
+    startSchedulers();
+    console.log('📅 Email schedulers started');
+})
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes

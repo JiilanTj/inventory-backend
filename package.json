@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node seeders/seeder.js"
+    "seed": "node seeders/seeder.js",
+    "test:email": "node tests/testEmail.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.0",
     "morgan": "^1.10.0",
+    "nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
     "pdfkit": "^0.17.1",
     "validator": "^13.15.15"
