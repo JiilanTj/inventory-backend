@@ -13,9 +13,26 @@ const exportRoutes = require('./routes/exportRoutes');
 
 const app = express();
 
+// CORS Configuration
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',     // React default
+        'http://localhost:5173',     // Vite default
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5173',
+        /^http:\/\/localhost:\d+$/,   // Any localhost port
+        /^http:\/\/127\.0\.0\.1:\d+$/,// Any IP localhost port
+        /^https?:\/\/.*\.pakhjtedsmkn4pdl\.com$/ // Domain and all subdomains
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(morgan('dev')); // Optional
 
 // Connect to MongoDB
