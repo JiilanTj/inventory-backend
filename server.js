@@ -8,6 +8,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const borrowRoutes = require('./routes/borrowRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 const app = express();
 
@@ -37,6 +38,9 @@ app.use('/api/items', itemRoutes);
 
 // Borrow routes
 app.use('/api/borrows', borrowRoutes);
+
+// Export routes
+app.use('/api/export', exportRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

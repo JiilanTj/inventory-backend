@@ -1,12 +1,13 @@
 # Inventory Management System API Documentation
 
-Backend sistem manajemen inventaris untuk jurusan RPL dengan fitur autentikasi, manajemen barang, dan sistem peminjaman.
+Backend sistem manajemen inventaris untuk jurusan RPL dengan fitur autentikasi, manajemen barang, sistem peminjaman, dan export data.
 
 ## 🚀 Tech Stack
 - Node.js & Express
 - MongoDB & Mongoose
 - JWT Authentication
 - BCrypt Password Hashing
+- ExcelJS & PDFKit untuk export data
 
 ## 📋 Prerequisites
 - Node.js v14+
@@ -422,3 +423,137 @@ Items yang di-generate akan memiliki:
 - Lokasi random
 - Tanggal pembelian dalam 1 tahun terakhir
 - Garansi 1 tahun dari tanggal pembelian
+
+## 📊 Export Data API Endpoints
+
+### Export Items ke Excel (Admin Only)
+```http
+GET /api/export/items/excel
+Authorization: Bearer jwt_token_here
+```
+Menghasilkan file Excel dengan:
+- Sheet "Inventory Items"
+- Kolom: Kode, Nama, Kategori, Kondisi, Status, Lokasi, Harga, dll
+- Format harga dalam Rupiah
+- Format tanggal dalam WIB
+- Styling header dengan background abu-abu
+- Nama file: `Inventory_YYYY-MM-DD.xlsx`
+
+### Export Items ke PDF (Admin Only)
+```http
+GET /api/export/items/pdf
+Authorization: Bearer jwt_token_here
+```
+Menghasilkan file PDF dengan:
+- Judul "Laporan Inventaris RPL"
+- Tanggal cetak (WIB)
+- Tabel items (15 items per halaman)
+- Kolom: Kode, Nama, Kategori, Kondisi, Status
+- Total items di akhir laporan
+- Nama file: `Inventory_YYYY-MM-DD.pdf`
+
+### Export Peminjaman ke Excel (Admin Only)
+```http
+GET /api/export/borrows/excel
+Authorization: Bearer jwt_token_here
+```
+Menghasilkan file Excel dengan:
+- Sheet "Peminjaman"
+- Kolom: Kode Pinjam, Peminjam, Kelas, Barang, Tanggal Pinjam, Tenggat, Status, dll
+- Format tanggal dalam WIB
+- List barang yang dipinjam dalam satu cell
+- Styling header dengan background abu-abu
+- Nama file: `Peminjaman_YYYY-MM-DD.xlsx`
+
+### Export Peminjaman ke PDF (Admin Only)
+```http
+GET /api/export/borrows/pdf
+Authorization: Bearer jwt_token_here
+```
+Menghasilkan file PDF dengan:
+- Judul "Laporan Peminjaman Inventaris RPL"
+- Tanggal cetak (WIB)
+- Tabel peminjaman (12 peminjaman per halaman)
+- Kolom: Kode, Peminjam, Barang, Status, Tenggat
+- Total peminjaman di akhir laporan
+- Nama file: `Peminjaman_YYYY-MM-DD.pdf`
+
+## ✅ Fitur yang Sudah Diimplementasikan
+
+### 1. Authentication System
+- [x] User registration dan login
+- [x] Role-based access (admin dan user)
+- [x] Token validation
+- [x] User profile (me) endpoint
+- [x] JWT-based authentication
+- [x] Password hashing dengan BCrypt
+
+### 2. Item Management
+- [x] Complete CRUD operations
+- [x] Model item dengan fields lengkap
+- [x] Advanced filtering & sorting
+- [x] Public access untuk view
+- [x] Admin-only untuk modifikasi
+- [x] Statistik items
+- [x] Auto-generate kode item
+- [x] Validasi input
+
+### 3. Borrowing System
+- [x] Model peminjaman lengkap
+- [x] Multiple items per peminjaman
+- [x] Status tracking otomatis
+- [x] Condition tracking
+- [x] Due date management
+- [x] Statistik peminjaman
+- [x] Role-based permissions
+- [x] Validasi ketersediaan item
+- [x] Auto-populate data terkait
+
+### 4. Data Export
+- [x] Export items ke Excel
+- [x] Export items ke PDF
+- [x] Export peminjaman ke Excel
+- [x] Export peminjaman ke PDF
+- [x] Format data dalam Rupiah dan WIB
+- [x] Auto-paging untuk PDF
+- [x] Styling untuk Excel
+
+### 5. Extra Features
+- [x] Timezone WIB untuk semua operasi
+- [x] Database seeder untuk testing
+- [x] Dokumentasi API lengkap
+- [x] Error handling
+- [x] Input validation
+- [x] Auto-update status overdue
+
+## ❌ Fitur yang Belum Diimplementasikan
+
+### 1. Email Notifications
+- [ ] Setup Nodemailer
+- [ ] Template email
+- [ ] Notifikasi peminjaman baru
+- [ ] Notifikasi status update
+- [ ] Due date reminder
+- [ ] Overdue notice
+
+### 2. Security & Performance
+- [ ] Rate limiting untuk API
+- [ ] API key untuk public access
+- [ ] Request validation
+- [ ] Response compression
+- [ ] Cache layer
+
+### 3. Testing & Monitoring
+- [ ] Unit testing dengan Jest
+- [ ] Integration testing
+- [ ] API testing
+- [ ] Logging system
+- [ ] Performance monitoring
+- [ ] Error tracking
+
+### 4. Backup & Recovery
+- [ ] Scheduled MongoDB backups
+- [ ] Cloud backup
+- [ ] Backup rotation
+- [ ] Recovery procedure
+- [ ] Data versioning
