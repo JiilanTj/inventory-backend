@@ -15,19 +15,19 @@ const app = express();
 
 // CORS Configuration
 const corsOptions = {
-    origin: [
-        'http://localhost:3000',     // React default
-        'http://localhost:5173',     // Vite default
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5173',
-        /^http:\/\/localhost:\d+$/,   // Any localhost port
-        /^http:\/\/127\.0\.0\.1:\d+$/,// Any IP localhost port
-        /^https?:\/\/.*\.pakhjtedsmkn4pdl\.com$/ // Domain and all subdomains
-    ],
+    origin: true, // Allow all origins for Flutter app
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+        'Content-Type', 
+        'Authorization',
+        'Accept',
+        'Origin',
+        'X-Requested-With',
+        'Access-Control-Allow-Origin'
+    ],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    exposedHeaders: ['Content-Length', 'Content-Type', 'Authorization']
 };
 
 // Middleware

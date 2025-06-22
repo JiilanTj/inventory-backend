@@ -135,3 +135,60 @@ exports.validateToken = async (req, res) => {
         });
     }
 };
+
+// Register new admin (only accessible by admins)
+exports.registerAdmin = async (req, res) => {
+    try {
+        // Force the role to be admin regardless of what's sent in the request
+        const newAdmin = await User.create({
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
+            class: req.body.class,
+            role: 'admin', // Force role to be admin
+            password: req.body.password
+        });
+
+        createSendToken(newAdmin, 201, res);
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};
+
+// Get all users with optional role filter (admin only)
+exports.getAllUsers = async (req, res) => {
+    try {
+        // Build query
+        let query = User.find();
+        
+        // Apply role filter if provided
+        if (req.query.role) {
+            if (!['admin', 'user'].includes(req.query.role)) {
+                return res.status(400).json({
+                    status: 'fail',
+                    message: 'Invalid role. Must be either "admin" or "user"'
+                });
+            }
+            query = query.where('role').equals(req.query.role);
+        }
+
+        // Execute query
+        const users = await query.select('-__v');
+
+        res.status(200).json({
+            status: 'success',
+            results: users.length,
+            data: {
+                users
+            }
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};

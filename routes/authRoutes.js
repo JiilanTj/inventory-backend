@@ -11,6 +11,10 @@ router.post('/login', authController.login);
 router.get('/me', protect, authController.getMe);
 router.get('/validate-token', protect, authController.validateToken);
 
+// Admin routes
+router.post('/register-admin', protect, isAdmin, authController.registerAdmin);
+router.get('/users', protect, isAdmin, authController.getAllUsers);
+
 // Example of protected admin route
 // router.get('/admin-only', protect, isAdmin, adminController.someAdminFunction);
 
