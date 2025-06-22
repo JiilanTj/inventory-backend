@@ -189,14 +189,18 @@ exports.updateBorrowStatus = async (req, res) => {
             borrow.returnNotes = req.body.returnNotes;
 
             // Update items status
-            const itemIds = borrow.items.map(item => item.item._id);
-            await Item.updateMany(
-                { _id: { $in: itemIds } },
-                { 
-                    status: 'Tersedia',
-                    condition: req.body.returnCondition
-                }
-            );
+            const itemIds = borrow.items
+                .map(item => item.item && item.item._id ? item.item._id : null)
+                .filter(Boolean);
+            if (itemIds.length > 0) {
+                await Item.updateMany(
+                    { _id: { $in: itemIds } },
+                    { 
+                        status: 'Tersedia',
+                        condition: req.body.returnCondition
+                    }
+                );
+            }
         }
 
         await borrow.save();

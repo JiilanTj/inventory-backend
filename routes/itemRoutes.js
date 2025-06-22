@@ -5,14 +5,12 @@ const { protect, isAdmin } = require('../middleware/authMiddleware');
 
 // Public routes
 router.get('/', itemController.getAllItems);
+router.get('/stats', itemController.getItemStats);
 router.get('/:id', itemController.getItem);
 
 // Protected admin routes
 router.use(protect);
 router.use(isAdmin);
-
-// Stats route
-router.get('/stats', itemController.getItemStats);
 
 // Protected CRUD routes
 router.post('/', itemController.createItem);
